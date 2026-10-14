@@ -1,28 +1,28 @@
 # Nota
 
-macOS üçün yüngül, native sticky-notes widget-i. Notlar ekranda tünd "şüşə" pəncərələr kimi durur,
-Markdown canlı render olunur, checkbox-lar kliklə işarələnir. Dock-da ikon yoxdur — tətbiq yalnız
-not pəncərələri və menu bar ikonu kimi yaşayır.
+A lightweight, native sticky-notes widget for macOS. Notes float on screen as dark glass windows,
+Markdown renders live, and checkboxes toggle with a click. There is no Dock icon — the app lives
+only as note windows plus a menu bar item.
 
-SwiftPM + AppKit ilə yazılıb, heç bir xarici asılılığı yoxdur.
+Built with SwiftPM + AppKit, no external dependencies.
 
-## Xüsusiyyətlər
+## Features
 
-- **Bir neçə not** — hər not ayrıca pəncərədir; `+` düyməsi və ya menu bar → "Yeni not" ilə yenisini aç.
-- **Canlı Markdown** — sintaksis işarələri (`**`, `~~`, `#` …) gizlənir, yalnız kursorun olduğu sətirdə görünür ki, redaktə edə biləsən.
-- **İnteraktiv checkbox-lar** — `[]` yaz, avtomatik checkbox-a çevrilir; klik edəndə işarələnir.
-- **Siyahı davamı** — Enter checkbox, bullet və nömrəli siyahını davam etdirir; boş maddədə Enter siyahıdan çıxır.
-- **Qlobal qısayol** — `⌥⌘N` istənilən yerdən bütün notları önə gətirir.
-- **Həmişə üstdə** — notları bütün pəncərələrin üstündə və bütün Spaces-də saxla.
-- **Login-da başlat** — kompüter açılanda avtomatik işə düşür.
-- **Avtomatik yadda saxlama** — hər not adi `.md` faylıdır; pəncərənin yeri və ölçüsü də yadda qalır.
+- **Multiple notes** — each note is its own window; open a new one with the `+` button or menu bar → "Yeni not".
+- **Live Markdown** — syntax markers (`**`, `~~`, `#` …) are hidden and only appear on the line with the caret, so you can still edit them.
+- **Interactive checkboxes** — type `[]` and it turns into a checkbox; click to toggle.
+- **List continuation** — Enter continues checkbox, bullet, and numbered lists; Enter on an empty item exits the list.
+- **Global hotkey** — `⌥⌘N` brings all notes to the front from anywhere.
+- **Always on top** — keep notes above other windows and on every Space.
+- **Launch at login** — starts automatically when you log in.
+- **Autosave** — each note is a plain `.md` file; window position and size are remembered too.
 
-## Tələblər
+## Requirements
 
-- macOS 14 (Sonoma) və ya daha yeni
-- Swift 6 toolchain (Xcode və ya Command Line Tools)
+- macOS 14 (Sonoma) or later
+- Swift 6 toolchain (Xcode or Command Line Tools)
 
-## Quraşdırma
+## Installation
 
 ```bash
 git clone git@github.com:nazaraliyev/my-sticky.git
@@ -30,105 +30,106 @@ cd my-sticky
 ./scripts/install.sh
 ```
 
-Skript tətbiqi build edir, `/Applications`-a (yazma icazəsi yoxdursa `~/Applications`-a) köçürür,
-işə salır və login item kimi qeydiyyatdan keçirir. Kodu dəyişəndən sonra yenidən işə sal — köhnə
-versiyanı özü bağlayıb əvəz edir.
+The script builds the app, copies it to `/Applications` (or `~/Applications` if `/Applications`
+isn't writable), launches it, and registers it as a login item. Re-run it after changing the code —
+it quits and replaces the running copy.
 
-Yalnız `.app` bundle lazımdırsa:
+If you only need the `.app` bundle:
 
 ```bash
-./scripts/make_app.sh   # dist/Nota.app yaradır
+./scripts/make_app.sh   # creates dist/Nota.app
 open dist/Nota.app
 ```
 
-## İstifadə
+## Usage
 
-Menu bar-dakı not ikonu tətbiqin əsas idarəetməsidir:
+The note icon in the menu bar is the app's main control. The UI is in Azerbaijani:
 
-| Menyu                        | Nə edir                                              |
-| ---------------------------- | ---------------------------------------------------- |
-| Yeni not                     | Yeni boş not açır                                    |
-| Bütün notları göstər (⌥⌘N)   | Gizlədilmiş notlar da daxil, hamısını önə gətirir   |
-| Həmişə üstdə (bütün Spaces)  | Notları digər pəncərələrin üstündə saxlayır          |
-| Login-da başlat              | Avtomatik başlamağı yandırıb-söndürür                |
-| Çıxış                        | Tətbiqdən çıxır                                      |
+| Menu item                    | Meaning                         | What it does                                  |
+| ---------------------------- | ------------------------------- | --------------------------------------------- |
+| Yeni not                     | New note                        | Opens a new empty note                        |
+| Bütün notları göstər (⌥⌘N)   | Show all notes                  | Brings every note forward, including hidden ones |
+| Həmişə üstdə (bütün Spaces)  | Always on top (all Spaces)      | Keeps notes above other windows               |
+| Login-da başlat              | Start at login                  | Toggles launching at login                    |
+| Çıxış                        | Quit                            | Quits the app                                 |
 
-Pəncərə düymələri siçanı notun üzərinə gətirəndə görünür. Notu istənilən boş yerindən sürüşdürüb
-daşıya bilərsən. Qırmızı düymə:
+Window buttons fade in when you hover over a note. Drag a note from any empty area to move it.
+The red close button:
 
-- **boş** notu tamamilə silir;
-- **məzmunlu** notu sadəcə gizlədir — `⌥⌘N` ilə geri qaytarılır.
+- **deletes** an empty note entirely;
+- **hides** a note that has content — bring it back with `⌥⌘N`.
 
-### Qısayollar
+### Keyboard shortcuts
 
-| Qısayol         | Əməliyyat                                   |
+| Shortcut        | Action                                      |
 | --------------- | ------------------------------------------- |
-| `⌥⌘N`           | Bütün notları göstər (qlobal, hər yerdən)   |
-| `⌘B` / `⌘I`     | Qalın / əyri                                |
-| `⌘=` / `⌘-`     | Şrifti böyüt / kiçilt (bütün notlarda)      |
-| `⌘Z` / `⇧⌘Z`    | Geri al / təkrarla                          |
-| `⌘Q`            | Çıxış                                       |
+| `⌥⌘N`           | Show all notes (global, works anywhere)     |
+| `⌘B` / `⌘I`     | Bold / italic                               |
+| `⌘=` / `⌘-`     | Increase / decrease font size (all notes)   |
+| `⌘Z` / `⇧⌘Z`    | Undo / redo                                 |
+| `⌘Q`            | Quit                                        |
 
-Qlobal qısayol Carbon `RegisterEventHotKey` ilə qeyd olunur, ona görə Accessibility icazəsi tələb etmir.
+The global hotkey is registered with Carbon's `RegisterEventHotKey`, so it doesn't need
+Accessibility permission.
 
-### Dəstəklənən Markdown
+### Supported Markdown
 
-| Yazırsan                 | Nəticə                     |
-| ------------------------ | -------------------------- |
-| `# Başlıq` … `###### `   | Başlıqlar                  |
-| `**qalın**`              | **qalın**                  |
-| `*əyri*` və ya `_əyri_`  | *əyri*                     |
-| `~~xətli~~`              | ~~xətli~~                  |
-| `` `kod` ``              | `kod`                      |
-| `<u>altı xətli</u>`      | altı xətli                 |
-| `> sitat`                | Girintili, solğun sitat    |
-| `- `, `* `, `+ `         | Bullet siyahı              |
-| `1. `                    | Nömrəli siyahı             |
-| `[]`, `[ ]`, `[x]`       | Checkbox                   |
+| You type                     | Result                      |
+| ---------------------------- | --------------------------- |
+| `# Heading` … `###### `      | Headings                    |
+| `**bold**`                   | **bold**                    |
+| `*italic*` or `_italic_`     | *italic*                    |
+| `~~strikethrough~~`          | ~~strikethrough~~           |
+| `` `code` ``                 | `code`                      |
+| `<u>underline</u>`           | underlined text             |
+| `> quote`                    | Indented, dimmed quote      |
+| `- `, `* `, `+ `             | Bullet list                 |
+| `1. `                        | Numbered list               |
+| `[]`, `[ ]`, `[x]`           | Checkbox                    |
 
-## Məlumatlar harada saxlanılır
+## Where data is stored
 
-- **Notlar:** `~/Library/Application Support/Nota/note-<id>.md` — adi Markdown, istənilən redaktorla açıla və sinxronlaşdırıla bilər.
-- **Ayarlar** (notların siyahısı, pəncərə yerləri, şrift ölçüsü, "həmişə üstdə"): `UserDefaults`, bundle ID `com.nazar.nota`.
+- **Notes:** `~/Library/Application Support/Nota/note-<id>.md` — plain Markdown you can open in any editor or sync.
+- **Settings** (note list, window frames, font size, always-on-top): `UserDefaults`, bundle ID `com.nazar.nota`.
 
 ## Development
 
 ```bash
 swift build
-swift run Nota               # tətbiqi birbaşa işə salır
-swift run Nota --selftest    # pəncərəsiz yoxlamalar (Markdown round-trip, checkbox, siyahılar)
+swift run Nota               # run the app directly
+swift run Nota --selftest    # headless checks (Markdown round-trip, checkboxes, lists)
 ```
 
-"Login-da başlat" yalnız `.app` bundle-dan işləyəndə işləyir (`SMAppService` tələbi), ona görə
-`swift run` ilə test edəndə bu seçim təsirsizdir.
+"Login-da başlat" (start at login) only works when running from a `.app` bundle (an `SMAppService`
+requirement), so it has no effect under `swift run`.
 
-### Struktur
+### Project layout
 
 ```
 Sources/Nota/
-├── main.swift                 # Giriş nöqtəsi, --selftest
-├── AppDelegate.swift          # Gizli main menu (qısayollar), başlanğıc
-├── NoteManager.swift          # Bütün notların idarəsi
-├── NoteWindowController.swift # Bir not pəncərəsi: chrome, rejim, autosave
-├── NotePanel.swift            # NSPanel alt sinfi
-├── ChromeViews.swift          # Hover effekti, "kağız" fon
-├── MarkdownTextView.swift     # Redaktor: canlı preview, checkbox, siyahı davamı
+├── main.swift                 # Entry point, --selftest
+├── AppDelegate.swift          # Hidden main menu (shortcuts), startup
+├── NoteManager.swift          # Manages all notes
+├── NoteWindowController.swift # One note window: chrome, mode, autosave
+├── NotePanel.swift            # NSPanel subclass
+├── ChromeViews.swift          # Hover effect view, "paper" background
+├── MarkdownTextView.swift     # Editor: live preview, checkboxes, list continuation
 ├── MarkdownRenderer.swift     # Markdown ⇄ NSAttributedString
-├── CheckboxAttachment.swift   # Kliklənən checkbox
-├── NoteDocument.swift         # Bir notun .md faylı
-├── Storage.swift              # Fayl yerləri, başlanğıc not
+├── CheckboxAttachment.swift   # Clickable checkbox
+├── NoteDocument.swift         # A note's .md file
+├── Storage.swift              # File locations, starter note
 ├── Settings.swift             # UserDefaults wrapper
-├── StatusBarController.swift  # Menu bar ikonu və menyu
+├── StatusBarController.swift  # Menu bar icon and menu
 ├── GlobalHotKey.swift         # ⌥⌘N
 ├── LaunchAtLogin.swift        # SMAppService wrapper
-└── SelfTest.swift             # Headless testlər
-packaging/Info.plist           # Bundle metadata (LSUIElement — Dock ikonu yoxdur)
-scripts/make_app.sh            # dist/Nota.app yaradır
-scripts/install.sh             # Build + quraşdırma + login item
+└── SelfTest.swift             # Headless tests
+packaging/Info.plist           # Bundle metadata (LSUIElement — no Dock icon)
+scripts/make_app.sh            # Builds dist/Nota.app
+scripts/install.sh             # Build + install + login item
 ```
 
-## Silmək
+## Uninstalling
 
-1. Menu bar → "Login-da başlat" seçimini söndür, sonra "Çıxış".
-2. `/Applications/Nota.app`-ı sil.
-3. Notları da silmək istəyirsənsə: `~/Library/Application Support/Nota/`.
+1. Menu bar → turn off "Login-da başlat", then choose "Çıxış" (Quit).
+2. Delete `/Applications/Nota.app`.
+3. To remove your notes too: `~/Library/Application Support/Nota/`.
