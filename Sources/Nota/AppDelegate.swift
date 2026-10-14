@@ -8,6 +8,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // keep working even though this is an accessory (no visible menu bar) app.
         NSApp.mainMenu = Self.makeMainMenu()
 
+        // Passed by scripts/install.sh so the installed copy registers itself
+        // as a login item (SMAppService must be called from inside the bundle).
+        if CommandLine.arguments.contains("--enable-login-item") {
+            LaunchAtLogin.set(true)
+        }
+
         NoteManager.shared.restore()
         statusBar = StatusBarController()
 
