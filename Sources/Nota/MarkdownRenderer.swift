@@ -39,6 +39,51 @@ enum MarkdownRenderer {
     private static let underlineRegex = try? NSRegularExpression(pattern: "<u>([^<\\n]*)</u>")
     private static let bulletMarkerRegex = try? NSRegularExpression(pattern: "^(\\s*)([-*+])\\s")
     private static let orderedMarkerRegex = try? NSRegularExpression(pattern: "^(\\s*)(\\d+\\.)\\s")
+    private static let orderedItemRegex = try? NSRegularExpression(pattern: "^([ \\t]*)(\\d+)\\.\\s")
+
+    // MARK: - Ordered-list numbering
+
+    /// Ordered-list numbers that are out of sequence: the range of each wrong number
+    /// and the number it should be. Consecutive `N.` lines at the same indent count
+    /// 1, 2, 3…; deeper-indented lines nest without breaking the outer list, while a
+    /// blank line or any other line at the same or shallower indent ends it.
+    static func orderedListFixes(in text: String) -> [(range: NSRange, number: Int)] {
+        guard let orderedItemRegex else { return [] }
+        let ns = text as NSString
+        var fixes: [(range: NSRange, number: Int)] = []
+        var levels: [(indent: Int, count: Int)] = []
+        ns.enumerateSubstrings(in: NSRange(location: 0, length: ns.length), options: .byLines) { line, lineRange, _, _ in
+            guard let line else { return }
+            let whitespace = line.prefix { $0 == " " || $0 == "\t" }
+            guard whitespace.count < line.count else { levels.removeAll(); return }
+            let indent = whitespace.reduce(0) { $0 + ($1 == "\t" ? 4 : 1) }
+            guard let m = orderedItemRegex.firstMatch(in: line, range: NSRange(location: 0, length: (line as NSString).length)) else {
+                while let last = levels.last, last.indent >= indent { levels.removeLast() }
+                return
+            }
+            while let last = levels.last, last.indent > indent { levels.removeLast() }
+            if let last = levels.last, last.indent == indent {
+                levels[levels.count - 1].count += 1
+            } else {
+                levels.append((indent, 1))
+            }
+            let expected = levels[levels.count - 1].count
+            let digits = m.range(at: 2)
+            if Int((line as NSString).substring(with: digits)) != expected {
+                fixes.append((NSRange(location: lineRange.location + digits.location, length: digits.length), expected))
+            }
+        }
+        return fixes
+    }
+
+    /// `markdown` with every ordered list numbered 1, 2, 3… (see `orderedListFixes`).
+    static func renumberingOrderedLists(_ markdown: String) -> String {
+        let result = NSMutableString(string: markdown)
+        for fix in orderedListFixes(in: markdown).reversed() {
+            result.replaceCharacters(in: fix.range, with: String(fix.number))
+        }
+        return result as String
+    }
 
     // MARK: - Token helpers
 
