@@ -68,7 +68,8 @@ final class MarkdownTextView: NSTextView {
     func loadMarkdown(_ markdown: String) {
         guard let storage = textStorage else { string = markdown; return }
         isProgrammatic = true
-        storage.setAttributedString(MarkdownRenderer.makeAttributedString(from: markdown))
+        let renumbered = MarkdownRenderer.renumberingOrderedLists(markdown)
+        storage.setAttributedString(MarkdownRenderer.makeAttributedString(from: renumbered))
         typingAttributes = MarkdownRenderer.baseTypingAttributes
         isProgrammatic = false
     }
@@ -91,8 +92,43 @@ final class MarkdownTextView: NSTextView {
         super.didChangeText()
         guard !isProgrammatic, let storage = textStorage else { return }
         convertMarkerBeforeCaret()
+        renumberOrderedLists()
         MarkdownRenderer.applyStyling(to: storage)
         onModelChange?()
+    }
+
+    /// Rewrite out-of-sequence ordered-list numbers (after deleting, inserting or
+    /// pasting items), keeping the selection on the same text.
+    private func renumberOrderedLists() {
+        guard let storage = textStorage else { return }
+        // Undo/redo restores text that was already numbered; editing mid-undo would corrupt the stack.
+        if let undoManager, undoManager.isUndoing || undoManager.isRedoing { return }
+        let fixes = MarkdownRenderer.orderedListFixes(in: storage.string)
+        guard !fixes.isEmpty else { return }
+
+        // Map a pre-edit index to its post-edit position (fixes are in ascending order).
+        func shifted(_ index: Int) -> Int {
+            var result = index
+            for fix in fixes where fix.range.location < index {
+                let newLength = (String(fix.number) as NSString).length
+                let offset = index - fix.range.location
+                result += offset >= fix.range.length ? newLength - fix.range.length : min(offset, newLength) - offset
+            }
+            return result
+        }
+        let sel = selectedRange()
+        let start = shifted(sel.location)
+        let end = shifted(sel.location + sel.length)
+
+        isProgrammatic = true
+        for fix in fixes.reversed() {
+            let number = String(fix.number)
+            guard shouldChangeText(in: fix.range, replacementString: number) else { continue }
+            storage.replaceCharacters(in: fix.range, with: NSAttributedString(string: number, attributes: MarkdownRenderer.baseTypingAttributes))
+            didChangeText()
+        }
+        isProgrammatic = false
+        setSelectedRange(NSRange(location: min(start, storage.length), length: max(0, min(end, storage.length) - start)))
     }
 
     private func convertMarkerBeforeCaret() {
@@ -356,6 +392,7 @@ final class MarkdownTextView: NSTextView {
         }
         isProgrammatic = false
         setSelectedRange(NSRange(location: min(caretAfter, storage.length), length: selectLength))
+        renumberOrderedLists()
         typingAttributes = MarkdownRenderer.baseTypingAttributes
         MarkdownRenderer.applyStyling(to: storage)
         onModelChange?()

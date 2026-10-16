@@ -68,6 +68,16 @@ enum SelfTest {
 
         check(edited("- item") { tv in end(tv); tv.insertNewline(nil) } == "- item\n- ", "bullet Enter → yeni maddə")
         check(edited("1. a") { tv in end(tv); tv.insertNewline(nil) } == "1. a\n2. ", "ordered Enter → nömrə artır")
+        check(edited("1. a\n2. b\n3. c") { tv in tv.setSelectedRange(NSRange(location: 4, length: 0)); tv.insertNewline(nil) } == "1. a\n2. \n3. b\n4. c", "ortada Enter → sonrakı nömrələr sürüşür")
+        check(edited("1. a\n2. b\n3. c\n4. d") { tv in tv.setSelectedRange(NSRange(location: 0, length: 15)); tv.deleteBackward(nil) } == "1. d", "ilk maddələri silmək → nömrələr 1-dən başlayır")
+        check(edited("4. DB Viewer Page\n5. Standalone pages\n5. QRMenu Online Order\n8. ") { _ in } == "1. DB Viewer Page\n2. Standalone pages\n3. QRMenu Online Order\n4. ", "yüklənəndə nömrələr düzəlir")
+        var caretAfterTyping = -1
+        check(edited("1. a\n") { tv in
+            end(tv)
+            for ch in ["1", "0", ".", " ", "x"] { tv.insertText(ch, replacementRange: tv.selectedRange()) }
+            caretAfterTyping = tv.selectedRange().location
+        } == "1. a\n2. x" && caretAfterTyping == 9, "\"10. \" yazanda 2-yə düzəlir, kursor yerində qalır")
+        check(MarkdownRenderer.renumberingOrderedLists("3. a\n   7. x\n   7. y\n9. b\n\n5. c\n- z\n2. d") == "1. a\n   1. x\n   2. y\n2. b\n\n1. c\n- z\n1. d", "iç-içə siyahılar və boş sətir ayrıca sayılır")
         check(edited("- ") { tv in end(tv); tv.insertNewline(nil) } == "", "boş bulletdə Enter → marker silinir")
         check(edited("[ ] task") { tv in end(tv); tv.insertNewline(nil) } == "[ ] task\n[ ] ", "checkbox Enter → yeni checkbox")
         check(edited("[ ] ") { tv in end(tv); tv.insertNewline(nil) } == "", "boş checkboxda Enter → adi mətnə çevrilir")
